@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@4.8.0/dist/echarts.min.js"></script>
+    <style>
+      body, canvas {
+        padding: 0;
+        margin: 0;
+        color: #c23531;
+        color: #1175f8;
+        color: #dd11f8;
+        color: #11f81d;
+        color: #f8f411;
+        color: #ffa500;
+        color: #a86a0c;
+        color: #df6ea3;
+        color: #c23531;
+        color: #000000;
+      }
+    </style>
+</head>
+<body>
+  <div id="main"></div>
+  <script type="text/javascript">
+    const main = document.getElementById('main')
+    main.style.width = window.innerWidth + 'px'
+    main.style.height = window.innerHeight + 'px'
+    var myChart = echarts.init(main);
+    const map = []
+    var data = [{
+      symbolSize: 10,
+      id: 0,
+      name: '0'
+    }];
+    var colors = ["#ffffff", "#c23531", "#c23531", "#c23531", "#c23531", "#c23531", "#c23531", "#c23531", "#c23531", "#1175f8", "#dd11f8", "#11f81d", "#f8f411", "#ffa500", "#a86a0c", "#df6ea3", "#df0707", "#000000"]
+    var edges = [];
+
+    option = {
+        series: [{
+          type: 'graph',
+          layout: 'force',
+          animation: false,
+          roam: true,
+          data: data,
+          force: {
+              repulsion: 100,
+              edgeLength: 5
+          },
+          edges: edges
+        }]
+    };
+    var si
+    var iii = 0
+    var source = 0
+    var ll = 1
+    var sourceList = []
+    var offset = 10
+    var add = function () {
+      data.push({
+          id: data.length,
+          name: data.length + ''
+      });
+      sourceList.push(data.length)
+      map[source] ? map[source]++ : map[source] = 1
+      var target = data.length - 1;
+      map[target] = 1
+      data = data.map(item => ({
+        id: item.id,
+        symbolSize: 10 + (map[item.id] || 0) * 2,
+        itemStyle: {
+          color: colors[map[item.id] || 0]
+        }
+      }))
+      if (source !== target) {
+          edges.push({
+              source: source,
+              target: target
+          });
+      }
+      myChart.setOption({
+          series: [{
+              roam: true,
+              data: data,
+              edges: edges
+          }]
+      });
+      if (Math.random() < (ll - offset) / ll) {
+        offset = Math.floor(Math.random() * 10) + 1
+        ll = 1
+        source = sourceList.shift()
+      } else {
+        ll++
+      }
+      iii++
+      if (iii > 2000) {
+        clearInterval(si)
+        const mm = map.map((item, i) => ({
+          size: item,
+          id: i
+        }))
+        mm.sort((a, b) => {
+          return (b && b.size || -1) - (a && a.size || -1)
+        })
+        console.log(map, mm)
+      }
+    }
+    si = setInterval(add, 1000 / 60);
+    myChart.setOption(option);
+  </script>
+</body>
+</html>
